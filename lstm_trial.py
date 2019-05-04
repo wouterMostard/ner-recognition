@@ -112,13 +112,26 @@ model.fit(X_train, y_train, epochs=10, validation_data=(X_test, y_test))
 
 predictions = model.predict(X_test)
 
+predictions = model.predict(X_test)
 
+ner_tag = ['<padding>','B-Company name', 'B-Employee' ,'B-Function', 'B-Person'
+ ,'B-Related company', 'B-Title' ,'I-Company name' ,'I-Employee', 'I-Function'
+ ,'I-Person', 'I-Related company', 'I-Title', 'O']
+
+ner_idx_to_name = {}
+for i in range(len(ner_tag)):
+    ner_idx_to_name[i] = ner_tag[i]
+
+prediction_df = {'prediction': [], 'actual': [], 'id': []}
 for i in range(len(y_test)):
-    if np.sum(np.argmax(predictions[i], axis=1)) != 12*len(np.argmax(predictions[i], axis=1)):
-        print('predicted: ')
-        print(np.argmax(predictions[i], axis=1))
-        print('actual:')
-        print(np.argmax(y_test[i], axis=1))
+    for j in np.argmax(predictions[i], axis=1):
+        prediction_df['prediction'].append(ner_idx_to_name[j])
+        prediction_df['id'].append(i)
+        
+    for j in np.argmax(y_test[i], axis=1):
+        prediction_df['actual'].append(ner_idx_to_name[j])
+        
+result_df = pd.DataFrame(prediction_df)
 
 
 
