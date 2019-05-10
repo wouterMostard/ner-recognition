@@ -30,8 +30,10 @@ class Target():
     
     
     def generate_LSTM_dataset(self, entities):
+        labels = entities.copy()
+#         labels.remove("<padding>")
         encoder = LabelBinarizer()
-        encoder.fit(np.array(entities).flatten())
+        encoder.fit(np.array(labels).flatten())
         
         self.encoded_classes = encoder.classes_
         
@@ -41,7 +43,7 @@ class Target():
     
         return dataset
     
-    def get_target_pos(self, input_data):
+    def get_target_ner(self, input_data):
         entities = self.get_entities(input_data)
         
         self.apply_padding(entities)

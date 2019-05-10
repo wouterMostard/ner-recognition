@@ -12,10 +12,9 @@ class WordEmbeddings():
             else:
                 num_fill = self.max_sentence_size - len(sentence)
                 for i in range(num_fill):
-                    sentences[index].append(-1) # A float is required for masking
+                    sentences[index].append('<padding>') # A float is required for masking
                     
         return sentences
-
 
     def get_sentences(self, input_data):
         sentences = []
@@ -28,22 +27,3 @@ class WordEmbeddings():
                 sentence = []
 
         return sentences
-    
-    
-    def generate_LSTM_dataset(self, sentences):
-        dataset = np.zeros((len(sentences), self.max_sentence_size, self.word_embeddings_length))
-        for sentence_index in range(len(sentences)):
-            for word_index, word in enumerate(sentences[sentence_index]):
-                try:
-                    dataset[sentence_index, word_index, :] = self.word_embeddings[word]
-                except:
-                    dataset[sentence_index, word_index, :] = np.zeros((1, self.word_embeddings_length))
-    
-        return dataset
-    
-    def get_word_embeddings_input(self, input_data):
-        sentences = self.get_sentences(input_data)
-        
-        self.apply_padding(sentences)
-        
-        return self.generate_LSTM_dataset(sentences)

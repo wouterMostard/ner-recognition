@@ -3,7 +3,8 @@ import pandas as pd
 import random
 from sklearn.preprocessing import LabelBinarizer
 from keras.models import Sequential
-from keras.layers import LSTM, TimeDistributed, Dense
+from keras.layers import LSTM, TimeDistributed, Dense, Bidirectional
+from sklearn.model_selection import train_test_split
 
 all_data = pd.read_csv('./annotated_entities.csv')
 
@@ -95,20 +96,17 @@ def create_dataset(data, input_label, target_label):
 input_array, target_array = create_dataset(all_data, 'pos_tag', 'entity')
 
 
-from sklearn.model_selection import train_test_split
-
-
 X_train, X_test, y_train, y_test = train_test_split(input_array, target_array)
 
 
 
 model = Sequential()
-model.add(LSTM(500, input_shape=(MAX_SENTENCE_SIZE, input_array.shape[2]), return_sequences=True))
+model.add(Bidirectional(LSTM(500, input_shape=(MAX_SENTENCE_SIZE, input_array.shape[2]), return_sequences=True)))
 model.add(TimeDistributed(Dense(target_array.shape[2], activation='sigmoid')))
 model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['acc'])
 
 
-model.fit(X_train, y_train, epochs=10, validation_data=(X_test, y_test))
+model.fit(X_train, y_train, epochs=20, validation_data=(X_test, y_test))
 
 predictions = model.predict(X_test)
 
@@ -133,5 +131,5 @@ for i in range(len(y_test)):
         
 result_df = pd.DataFrame(prediction_df)
 
-
+result_df.to_csv('./results', index=0)
 
